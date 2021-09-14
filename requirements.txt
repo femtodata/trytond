@@ -1,0 +1,12 @@
+psycopg2
+bcrypt
+ldap3
+python-stdnum
+simpleeval
+stripe
+coda
+febelfin-coda
+zeep
+PyPDF2
+csb43
+ofxparse

@@ -1,0 +1,12 @@
+# dev environments only, some are emacs-specific
+autopep8
+black
+flask-shell-ipython
+flake8
+ipython
+jedi==0.17.2  # 18.0 breaks completion
+# pandasgui
+# pipdeptree
+# rope
+selenium
+yapf
