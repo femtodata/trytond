@@ -117,6 +117,7 @@ stock_package_shipping
 stock_package_shipping_dpd
 stock_package_shipping_ups
 stock_product_location
+stock_shipment_cost
 stock_shipment_measurements
 stock_split
 stock_supply

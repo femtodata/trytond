@@ -11,7 +11,7 @@ modules = [x.strip() for x in modules if x]
 
 module_dir = Path("../modules")
 
-module_dir.mkdir()
+module_dir.mkdir(exist_ok=True)
 
 git_base_cmd = "git clone git@github.com:tryton"
 
@@ -29,7 +29,7 @@ for module_dir in module_dirs:
     ln_dir = Path("trytond/modules") / module_dir.name
     target = Path("../..") / module_dir
 
-    if not target.exists():
+    if not ln_dir.exists():
 
         ln_dir.symlink_to(Path("../..") / module_dir, target_is_directory=True)
 
