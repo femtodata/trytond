@@ -32,3 +32,10 @@ for module_dir in module_dirs:
     if not target.exists():
 
         ln_dir.symlink_to(Path("../..") / module_dir, target_is_directory=True)
+
+sao_path = Path("../sao")
+
+if not sao_path.exists():
+
+    cmd_str = f"{git_base_cmd}/sao.git"
+    subprocess.run(cmd_str, shell=True, cwd="..")
