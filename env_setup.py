@@ -39,3 +39,10 @@ if not sao_path.exists():
 
     cmd_str = f"{git_base_cmd}/sao.git"
     subprocess.run(cmd_str, shell=True, cwd="..")
+
+sao_ln = Path("./sao")
+
+if not sao_ln.is_symlink():
+
+    sao_ln.symlink_to(sao_path, target_is_directory=True)
+
