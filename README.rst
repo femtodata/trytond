@@ -66,6 +66,9 @@ Tryton web client and modules
      yarn install
      yarn run grunt
 
+     # remember to back out to trytond directory
+     cd ..
+
 
 Startup: docker setup, tryton admin setup
 ++++
