@@ -3,4 +3,5 @@ __pycache__
 *.egg-info
 trytond/modules/*
 /sao
-trytond.code-workspace
+.vscode/*
+*.code-workspace
