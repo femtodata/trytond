@@ -50,7 +50,7 @@ Python version, install depdencies
    source .venv/bin/activate
 
    # install setup.py dependencies
-   pip install -e
+   pip install -e .
 
    # install additional requirements
    pip install -r requirements.txt -r requirements_dev.txt
