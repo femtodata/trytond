@@ -93,6 +93,7 @@ sale_invoice_grouping
 sale_opportunity
 sale_payment
 sale_price_list
+sale_product_customer
 sale_promotion
 sale_promotion_coupon
 sale_shipment_cost
