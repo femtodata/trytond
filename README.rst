@@ -82,6 +82,15 @@ Startup: docker setup, tryton admin setup
   ::
      TRYTONPASSFILE=trytonpass ./bin/trytond-admin -v -c trytond.conf -d tryton --email admin@tryton --all
 
+Import Countries, Subdivisions, Postal codes
+++++
+- making sure this is run with an activated venv
+  ::
+     python ../modules/country/scripts/import_countries.py -c trytond.conf -d tryton
+     python ../modules/country/scripts/import_postal_codes.py -c trytond.conf -d tryton us
+     python ../modules/country/scripts/import_postal_codes.py -c trytond.conf -d tryton cn
+     ...
+
 Run
 ++++
 Run via ``trytond``
