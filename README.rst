@@ -88,8 +88,9 @@ Import Countries, Subdivisions, Postal codes
   ::
      python ../modules/country/scripts/import_countries.py -c trytond.conf -d tryton
      python ../modules/country/scripts/import_postal_codes.py -c trytond.conf -d tryton us
-     python ../modules/country/scripts/import_postal_codes.py -c trytond.conf -d tryton cn
      ...
+
+  note: CN postal codes do not seem to be available for import
 
 Run
 ++++
