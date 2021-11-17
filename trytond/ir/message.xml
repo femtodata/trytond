@@ -124,6 +124,12 @@ this repository contains the full copyright notices and license terms. -->
         <record model="ir.message" id="msg_dict_schema_help_selection_json">
             <field name="text">Help Selection JSON</field>
         </record>
+        <record model="ir.message" id="msg_dict_yes">
+            <field name="text">Yes</field>
+        </record>
+        <record model="ir.message" id="msg_dict_no">
+            <field name="text">No</field>
+        </record>
         <record model="ir.message" id="msg_sequence">
             <field name="text">Sequence</field>
         </record>
@@ -237,6 +243,9 @@ this repository contains the full copyright notices and license terms. -->
         </record>
         <record model="ir.message" id="msg_report_invalid_email">
             <field name="text">Invalid email definition for report "%(name)s".</field>
+        </record>
+        <record model="ir.message" id="msg_report_invalid_record_name">
+            <field name="text">Invalid record name definition for report "%(report)s" with exception "%(exception)s".</field>
         </record>
         <record model="ir.message" id="msg_action_invalid_views">
             <field name="text">Invalid view "%(view)s" for action "%(action)s".</field>

@@ -8,7 +8,7 @@ from trytond.pool import Pool
 
 def avatar_mixin(size=64, default=None):
     class AvatarMixin:
-
+        __slots__ = ()
         avatars = fields.One2Many(
             'ir.avatar', 'resource', lazy_gettext('ir.msg_avatars'), size=1)
         avatar = fields.Function(
@@ -62,7 +62,9 @@ def avatar_mixin(size=64, default=None):
             if not records:
                 return
             for record in records:
-                record.avatar = generate(size, getattr(record, field))
+                avatar = generate(size, getattr(record, field))
+                if avatar:
+                    record.avatar = avatar
             cls.save(records)
 
         if default:

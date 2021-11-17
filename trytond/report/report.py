@@ -13,7 +13,6 @@ import warnings
 import zipfile
 import operator
 
-from decimal import Decimal
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
@@ -30,6 +29,7 @@ except ImportError:
     weasyprint = None
 
 from genshi.filters import Translator
+from genshi.template.text import TextTemplate
 
 from trytond.i18n import gettext
 from trytond.pool import Pool, PoolBase
@@ -140,11 +140,12 @@ class Report(URLMixin, PoolBase):
             report type,
             data,
             a boolean to direct print,
-            the report name
+            the report name (with or without the record names)
         '''
         pool = Pool()
         ActionReport = pool.get('ir.action.report')
         cls.check_access()
+        context = Transaction().context
 
         action_id = data.get('action_id')
         if action_id is None:
@@ -156,13 +157,22 @@ class Report(URLMixin, PoolBase):
         else:
             action_report = ActionReport(action_id)
 
-        def report_name(records):
+        def report_name(records, reserved_length=0):
             names = []
             name_length = 0
             record_count = len(records)
-            max_length = REPORT_NAME_MAX_LENGTH - len(str(record_count)) - 2
+            max_length = (REPORT_NAME_MAX_LENGTH
+                - reserved_length
+                - len(str(record_count)) - 2)
+            if action_report.record_name:
+                template = TextTemplate(action_report.record_name)
+            else:
+                template = None
             for record in records[:5]:
-                record_name = record.rec_name
+                if template:
+                    record_name = template.generate(record=record).render()
+                else:
+                    record_name = record.rec_name
                 name_length += len(record_name) + 1
                 if name_length > max_length:
                     break
@@ -192,6 +202,7 @@ class Report(URLMixin, PoolBase):
                 headers.append(dict(key))
 
         n = len(groups)
+        join_string = '-'
         if n > 1:
             padding = math.ceil(math.log10(n))
             content = BytesIO()
@@ -200,9 +211,10 @@ class Report(URLMixin, PoolBase):
                         zip(headers, groups), 1):
                     oext, rcontent = cls._execute(
                         group_records, header, data, action_report)
-                    filename = report_name(group_records)
                     number = str(i).zfill(padding)
-                    filename = slugify('%s-%s' % (number, filename))
+                    filename = report_name(
+                        group_records, len(number) + len(join_string))
+                    filename = slugify(join_string.join([number, filename]))
                     rfilename = '%s.%s' % (filename, oext)
                     content_zip.writestr(rfilename, rcontent)
             content = content.getvalue()
@@ -212,8 +224,15 @@ class Report(URLMixin, PoolBase):
                 groups[0], headers[0], data, action_report)
         if not isinstance(content, str):
             content = bytearray(content) if bytes == str else bytes(content)
-        filename = '-'.join(
-            filter(None, [action_report.name, report_name(records)]))
+        action_report_name = action_report.name[:REPORT_NAME_MAX_LENGTH]
+        if context.get('with_rec_name', True):
+            filename = join_string.join(
+                filter(None, [
+                    action_report_name,
+                    report_name(
+                        records, len(action_report_name) + len(join_string))]))
+        else:
+            filename = action_report_name
         return (oext, content, action_report.direct_print, filename)
 
     @classmethod
@@ -284,6 +303,7 @@ class Report(URLMixin, PoolBase):
         report_context['format_timedelta'] = cls.format_timedelta
         report_context['format_currency'] = cls.format_currency
         report_context['format_number'] = cls.format_number
+        report_context['format_number_symbol'] = cls.format_number_symbol
         report_context['datetime'] = datetime
 
         def set_lang(language=None):
@@ -441,7 +461,8 @@ class Report(URLMixin, PoolBase):
         Lang = pool.get('ir.lang')
         if lang is None:
             lang = Lang.get()
-        return lang.currency(value, currency, symbol, grouping, digits=digits)
+        return lang.currency(
+            value, currency, symbol=symbol, grouping=grouping, digits=digits)
 
     @classmethod
     def format_number(
@@ -450,13 +471,18 @@ class Report(URLMixin, PoolBase):
         Lang = pool.get('ir.lang')
         if lang is None:
             lang = Lang.get()
-        if digits is None:
-            d = value
-            if not isinstance(d, Decimal):
-                d = Decimal(repr(value))
-            digits = -int(d.as_tuple().exponent)
-        return lang.format('%.' + str(digits) + 'f', value,
-            grouping=grouping, monetary=monetary)
+        return lang.format_number(
+            value, digits=digits, grouping=grouping, monetary=monetary)
+
+    @classmethod
+    def format_number_symbol(
+            cls, value, lang, symbol, digits=None, grouping=True):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+        if lang is None:
+            lang = Lang.get()
+        return lang.format_number_symbol(
+            value, symbol, digits=digits, grouping=grouping)
 
 
 def get_email(report, record, languages):
@@ -478,7 +504,8 @@ def get_email(report, record, languages):
     msg = MIMEMultipart('alternative')
     msg.add_header('Content-Language', ', '.join(l.code for l in languages))
     for language in languages:
-        with Transaction().set_context(language=language.code):
+        with Transaction().set_context(
+                language=language.code, with_rec_name=False):
             ext, content, _, title = Report_.execute(
                 [record.id], {
                     'action_id': report_id,

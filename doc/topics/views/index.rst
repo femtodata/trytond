@@ -154,6 +154,14 @@ List of attributes shared by many form elements:
       :class:`trytond.model.fields.One2Many` to specifiy if the client must
       auto-complete the field. The default value is True.
 
+    .. _common-attributes-create:
+
+    * ``create``: A boolean to specify if the user can create targets from the
+      widget. The default value is ``True``.
+
+    * ``delete``: A boolean to specify if the user can delete targets from the
+      widget. The default value is ``True``.
+
     .. _common-attributes-factor:
 
     * ``factor``: A factor to apply on fields
@@ -166,6 +174,12 @@ List of attributes shared by many form elements:
 
     * ``symbol``: Only on numerical fields, the name of field which provides
       the symbol to display.
+
+    .. _common-attributes-grouping:
+
+    * ``grouping``: A boolean only on numerical fields to specify if the client
+      must use grouping separators to display on the widget. The default value
+      is True.
 
     .. _common-attributes-help_field:
 

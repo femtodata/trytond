@@ -3,7 +3,8 @@
 from sql import Literal
 from sql.operators import Equal
 
-from trytond.model import ModelSQL, fields, Check, Unique, Exclude
+from trytond.model import (
+    ModelSQL, fields, Check, Unique, Exclude, DeactivableMixin)
 from trytond.pool import Pool
 from trytond.pyson import Eval
 
@@ -80,6 +81,77 @@ class ModelSQLSearch(ModelSQL):
     "ModelSQL Search"
     __name__ = 'test.modelsql.search'
     name = fields.Char("Name")
+
+
+class ModelSQLSearchOR2Union(ModelSQL):
+    "ModelSQL Search OR to UNION optimization"
+    __name__ = 'test.modelsql.search.or2union'
+    name = fields.Char("Name")
+    target = fields.Many2One('test.modelsql.search.or2union.target', "Target")
+    targets = fields.One2Many(
+        'test.modelsql.search.or2union.target', 'parent', "Targets")
+    reference = fields.Reference(
+        "Reference",
+        [
+            (None, ""),
+            ('test.modelsql.search.or2union.target', "Target"),
+            ])
+    integer = fields.Integer("Integer")
+
+    @classmethod
+    def order_integer(cls, tables):
+        table, _ = tables[None]
+        return [table.integer + 1]
+
+
+class ModelSQLSearchOR2UnionTarget(ModelSQL):
+    "ModelSQL Target to test read"
+    __name__ = 'test.modelsql.search.or2union.target'
+    name = fields.Char("Name")
+    parent = fields.Many2One('test.modelsql.search.or2union', "Parent")
+
+
+class ModelSQLSearchOR2UnionOrder(ModelSQL):
+    "ModelSQL Search OR to UNION optimization with class order"
+    __name__ = 'test.modelsql.search.or2union.class_order'
+    name = fields.Char("Name")
+    reference = fields.Reference("Reference", [
+            (None, ''),
+            ('test.modelsql.search.or2union.class_order.target', "Target"),
+            ])
+    targets = fields.One2Many(
+        'test.modelsql.search.or2union.class_order.target', 'parent',
+        "Targets")
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order = [('reference', 'DESC')]
+
+
+class ModelSQLSearchOR2UnionOrderTarget(ModelSQL):
+    "ModelSQL Target to test read"
+    __name__ = 'test.modelsql.search.or2union.class_order.target'
+    name = fields.Char("Name")
+    parent = fields.Many2One(
+        'test.modelsql.search.or2union.class_order', "Parent")
+
+
+class ModelSQLForeignKey(DeactivableMixin, ModelSQL):
+    "ModelSQL Foreign Key"
+    __name__ = 'test.modelsql.fk'
+
+    target_cascade = fields.Many2One(
+        'test.modelsql.fk.target', "Target", ondelete='CASCADE')
+    target_null = fields.Many2One(
+        'test.modelsql.fk.target', "Target", ondelete='SET NULL')
+    target_restrict = fields.Many2One(
+        'test.modelsql.fk.target', "Target", ondelete='RESTRICT')
+
+
+class ModelSQLForeignKeyTarget(ModelSQL):
+    "ModelSQL Foreign Key Target"
+    __name__ = 'test.modelsql.fk.target'
 
 
 class NullOrder(ModelSQL):
@@ -160,6 +232,12 @@ def register(module):
         ModelSQLOne2Many,
         ModelSQLOne2ManyTarget,
         ModelSQLSearch,
+        ModelSQLSearchOR2Union,
+        ModelSQLSearchOR2UnionTarget,
+        ModelSQLSearchOR2UnionOrder,
+        ModelSQLSearchOR2UnionOrderTarget,
+        ModelSQLForeignKey,
+        ModelSQLForeignKeyTarget,
         NullOrder,
         ModelTranslation,
         ModelCheck,

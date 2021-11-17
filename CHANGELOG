@@ -1,3 +1,30 @@
+* Use RENAME and DROP COLUMN with SQLite backend
+* Support window functions with SQLite backend
+* Use JSONB to store Dict field on PostgreSQL backend
+
+Version 6.2.0 - 2021-11-01
+* Bug fixes (see mercurial logs for details)
+* Allow to cast to date with timezone
+* Support create/delete attribute in view
+* Skip default values when copying records
+* Use local cache for relation fields in readonly transactions
+* Add format method to DictSchemaMixin
+* Allow modify record name on the reports
+* Add methods to format number and symbol on Lang
+* Add format number with symbol on Report
+* Allow locking tables by calling ModelSQL.lock without records
+* Add test on domain of relation fields
+* Add stored path as alternative to MPTT
+* Activate and upgrade modules from configuration wizard
+* Add set_from_header in email tools
+* Add grouping attribute to numeric widgets
+* Ensure with a test that objects in the Pool have __slots__
+* Use bigdecimal tag for XML-RPC
+* Use tuple in Dict value instead of list
+* Do not set record name on title of report get_email
+* Add node to id of status
+* Use ImmutableDict for Transaction context
+* Use UNION for 'Or'-ed domain with subqueries
 * Add remove_forbidden_chars in tools
 * Manage errors during non-interactive operations
 * Add estimation count to ModelStorage

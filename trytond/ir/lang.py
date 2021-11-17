@@ -5,6 +5,7 @@ import datetime
 from locale import CHAR_MAX
 from ast import literal_eval
 
+from decimal import Decimal
 from sql import Table
 
 from trytond.cache import Cache
@@ -552,9 +553,29 @@ class Lang(DeactivableMixin, ModelSQL, ModelView):
             format = format.replace('%p', p)
         return value.strftime(format)
 
+    def format_number(self, value, digits=None, grouping=True, monetary=None):
+        if digits is None:
+            d = value
+            if not isinstance(d, Decimal):
+                d = Decimal(repr(value))
+            digits = -int(d.as_tuple().exponent)
+        return self.format(
+            '%.*f', (digits, value), grouping=grouping, monetary=monetary)
+
+    def format_number_symbol(self, value, symbol, digits=None, grouping=True):
+        symbol, position = symbol.get_symbol(value)
+        separated = (
+            value < 0 and self.n_sep_by_space or self.p_sep_by_space)
+        s = self.format_number(value, digits, grouping)
+        if position:
+            s = s + (separated and ' ' or '') + symbol
+        else:
+            s = symbol + (separated and ' ' or '') + s
+        return s
+
 
 class LangConfigStart(ModelView):
-    'Language Configuration Start'
+    "Configure languages"
     __name__ = 'ir.lang.config.start'
 
     languages = fields.Many2Many('ir.lang', None, None, "Languages")

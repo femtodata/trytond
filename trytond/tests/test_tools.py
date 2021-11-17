@@ -20,6 +20,7 @@ from trytond.tools.domain_inversion import (
     domain_inversion, parse, simplify, merge, concat, unique_value,
     eval_domain, localize_domain,
     prepare_reference_domain, extract_reference_models)
+from trytond.tools.immutabledict import ImmutableDict
 
 
 class ToolsTestCase(unittest.TestCase):
@@ -228,6 +229,48 @@ class ToolsTestCase(unittest.TestCase):
         "Test hyphenate in slugify"
         self.assertEqual(slugify('foo bar', hyphenate='_'), 'foo_bar')
 
+    def test_sortable_values(self):
+        def key(values):
+            return values
+
+        values = [
+            (('a', 1), ('b', None)),
+            (('a', 1), ('b', 3)),
+            (('a', 1), ('b', 2)),
+            ]
+
+        with self.assertRaises(TypeError):
+            sorted(values, key=key)
+        self.assertEqual(
+            sorted(values, key=sortable_values(key)), [
+                (('a', 1), ('b', 2)),
+                (('a', 1), ('b', 3)),
+                (('a', 1), ('b', None)),
+                ])
+
+    def test_firstline(self):
+        "Test firstline"
+        for text, result in [
+                ("", ""),
+                ("first line\nsecond line", "first line"),
+                ("\nsecond line", "second line"),
+                ("\n\nthird line", "third line"),
+                (" \nsecond line", "second line"),
+                ]:
+            with self.subTest(text=text, result=result):
+                self.assertEqual(firstline(text), result)
+
+    def test_remove_forbidden_chars(self):
+        "Test remove_forbidden_chars"
+        for string, result in [
+                ("", ""),
+                (None, None),
+                ("\ttest", "test"),
+                (" test ", "test"),
+                ]:
+            with self.subTest(string=string):
+                self.assertEqual(remove_forbidden_chars(string), result)
+
 
 class StringPartitionedTestCase(unittest.TestCase):
     "Test StringPartitioned"
@@ -309,6 +352,66 @@ class LazyStringTestCase(unittest.TestCase):
         s = 'bar' + s
 
         self.assertEqual(s, 'barfoo')
+
+
+class ImmutableDictTestCase(unittest.TestCase):
+    "Test ImmutableDict"
+
+    def test_setitem(self):
+        "__setitem__ not allowed"
+        d = ImmutableDict()
+
+        with self.assertRaises(TypeError):
+            d['foo'] = 'bar'
+
+    def test_delitem(self):
+        "__delitem__ not allowed"
+        d = ImmutableDict(foo='bar')
+
+        with self.assertRaises(TypeError):
+            del d['foo']
+
+    def test_ior(self):
+        "__ior__ not allowed"
+        d = ImmutableDict()
+
+        with self.assertRaises(TypeError):
+            d |= {'foo': 'bar'}
+
+    def test_clear(self):
+        "clear not allowed"
+        d = ImmutableDict(foo='bar')
+
+        with self.assertRaises(TypeError):
+            d.clear()
+
+    def test_pop(self):
+        "pop not allowed"
+        d = ImmutableDict(foo='bar')
+
+        with self.assertRaises(TypeError):
+            d.pop('foo')
+
+    def test_popitem(self):
+        "popitem not allowed"
+        d = ImmutableDict(foo='bar')
+
+        with self.assertRaises(TypeError):
+            d.popitem('foo')
+
+    def test_setdefault(self):
+        "setdefault not allowed"
+        d = ImmutableDict()
+
+        with self.assertRaises(TypeError):
+            d.setdefault('foo', 'bar')
+
+    def test_update(self):
+        "update not allowed"
+        d = ImmutableDict()
+
+        with self.assertRaises(TypeError):
+            d.update({'foo': 'bar'})
 
 
 class DomainInversionTestCase(unittest.TestCase):
@@ -818,54 +921,13 @@ class DomainInversionTestCase(unittest.TestCase):
             extract_reference_models(domain, 'x'), {'model_A', 'model_B'})
         self.assertEqual(extract_reference_models(domain, 'y'), set())
 
-    def test_sortable_values(self):
-        def key(values):
-            return values
-
-        values = [
-            (('a', 1), ('b', None)),
-            (('a', 1), ('b', 3)),
-            (('a', 1), ('b', 2)),
-            ]
-
-        with self.assertRaises(TypeError):
-            sorted(values, key=key)
-        self.assertEqual(
-            sorted(values, key=sortable_values(key)), [
-                (('a', 1), ('b', 2)),
-                (('a', 1), ('b', 3)),
-                (('a', 1), ('b', None)),
-                ])
-
-    def test_firstline(self):
-        "Test firstline"
-        for text, result in [
-                ("", ""),
-                ("first line\nsecond line", "first line"),
-                ("\nsecond line", "second line"),
-                ("\n\nthird line", "third line"),
-                (" \nsecond line", "second line"),
-                ]:
-            with self.subTest(text=text, result=result):
-                self.assertEqual(firstline(text), result)
-
-    def test_remove_forbidden_chars(self):
-        "Test remove_forbidden_chars"
-        for string, result in [
-                ("", ""),
-                (None, None),
-                ("\ttest", "test"),
-                (" test ", "test"),
-                ]:
-            with self.subTest(string=string):
-                self.assertEqual(remove_forbidden_chars(string), result)
-
 
 def suite():
     func = unittest.TestLoader().loadTestsFromTestCase
     suite = unittest.TestSuite()
     for testcase in [ToolsTestCase,
             StringPartitionedTestCase,
+            ImmutableDictTestCase,
             DomainInversionTestCase]:
         suite.addTests(func(testcase))
     suite.addTest(doctest.DocTestSuite(decimal_))

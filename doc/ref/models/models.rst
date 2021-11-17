@@ -42,13 +42,16 @@ Class attributes are:
     into the queue.
 
 .. attribute:: Model._fields
+
     It contains a dictionary with the field name as key and its
     :class:`~trytond.model.field` instance as value.
 
 .. attribute:: Model._record
+
     It stores the record class to store internaly the values of the instances.
 
 .. attribute:: Model._defaults
+
     It contains a dictionary with the field name as key and its default method
     as value.
 
@@ -521,9 +524,9 @@ Class methods:
 
 Dual methods:
 
-.. classmethod:: ModelSQL.lock(records)
+.. classmethod:: ModelSQL.lock([records])
 
-    Take a lock for update on the records.
+    Take a lock for update on the records or take a lock on the whole table.
 
 Constraint
 ==========
@@ -736,6 +739,10 @@ Instance methods:
 .. method:: DictSchemaMixin.get_selection_json(name)
 
     Getter for the :attr:`selection_json`.
+
+.. method:: DictSchemaMixin.format(value[, lang])
+
+   Format the value using the key definition and the language.
 
 ==========
 MatchMixin

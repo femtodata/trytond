@@ -55,6 +55,7 @@ from trytond.report import Report, get_email
 from trytond.rpc import RPC
 from trytond.sendmail import sendmail_transactional
 from trytond.tools import grouped_slice
+from trytond.tools.email_ import set_from_header
 from trytond.transaction import Transaction
 from trytond.url import host, http_host
 from trytond.wizard import Wizard, StateView, Button, StateTransition
@@ -93,7 +94,7 @@ def _send_email(from_, users, email_func):
             logger.info("Missing address for '%s' to send email", user.login)
             continue
         msg, title = email_func(user)
-        msg['From'] = from_ or from_cfg
+        set_from_header(msg, from_cfg, from_ or from_cfg)
         msg['To'] = user.email
         msg['Subject'] = Header(title, 'utf-8')
         sendmail_transactional(from_cfg, [user.email], msg)
@@ -285,7 +286,9 @@ class User(avatar_mixin(100, 'login'), DeactivableMixin, ModelSQL, ModelView):
         length = config.getint('password', 'length', default=0)
         if length > 0:
             if len(password_b) < length:
-                raise PasswordError(gettext('res.msg_password_length'))
+                raise PasswordError(gettext('res.msg_password_length',
+                        length=length,
+                        ))
         path = config.get('password', 'forbidden', default=None)
         if path:
             with open(path, 'r') as f:
