@@ -52,6 +52,10 @@ attlist.field &= attribute sum { text }?
 attlist.field &= attribute width { text }?
 attlist.field &= attribute height { text }?
 attlist.field &=
+  [ a:defaultValue = "1" ] attribute create { "0" | "1" }?
+attlist.field &=
+  [ a:defaultValue = "1" ] attribute delete { "0" | "1" }?
+attlist.field &=
   [ a:defaultValue = "left_to_right" ] attribute orientation {
     "left_to_right"
     | "right_to_left"
@@ -66,6 +70,7 @@ attlist.field &= attribute filename { text }?
 attlist.field &= attribute help_field { text }?
 attlist.field &= attribute view_ids { text }?
 attlist.field &= attribute symbol { text }?
+attlist.field &= [a:defaultValue = "1"] attribute grouping { "0" | "1" }?
 prefix = element prefix { attlist.affix, empty }
 suffix = element suffix { attlist.affix, empty }
 attlist.affix &= attribute string { text }?

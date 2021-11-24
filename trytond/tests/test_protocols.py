@@ -6,12 +6,55 @@ import json
 import datetime
 from decimal import Decimal
 
-from trytond.model.fields.dict import ImmutableDict
+from trytond.tools.immutabledict import ImmutableDict
 from trytond.protocols.jsonrpc import JSONEncoder, JSONDecoder, JSONRequest
 from trytond.protocols.xmlrpc import client, XMLRequest
 
 
-class JSONTestCase(unittest.TestCase):
+class DumpsLoadsMixin:
+
+    def dumps_loads(self, value):
+        raise NotImplementedError
+
+    def test_datetime(self):
+        'Test datetime'
+        self.dumps_loads(datetime.datetime.now())
+
+    def test_date(self):
+        'Test date'
+        self.dumps_loads(datetime.date.today())
+
+    def test_time(self):
+        'Test time'
+        self.dumps_loads(datetime.datetime.now().time())
+
+    def test_timedelta(self):
+        "Test timedelta"
+        self.dumps_loads(datetime.timedelta(days=1, seconds=10))
+
+    def test_bytes(self):
+        'Test bytes'
+        self.dumps_loads(bytes(b'foo'))
+        self.dumps_loads(bytearray(b'foo'))
+
+    def test_decimal(self):
+        'Test Decimal'
+        self.dumps_loads(Decimal('3.141592653589793'))
+
+    def test_biginteger(self):
+        "Test BigInteger"
+        self.dumps_loads(client.MAXINT + 1)
+
+    def test_immutable_dict(self):
+        "Test ImmutableDict"
+        self.dumps_loads(ImmutableDict(foo='bar'))
+
+    def test_none(self):
+        'Test None'
+        self.dumps_loads(None)
+
+
+class JSONTestCase(DumpsLoadsMixin, unittest.TestCase):
     'Test JSON'
 
     def test_json_request(self):
@@ -29,33 +72,8 @@ class JSONTestCase(unittest.TestCase):
                 json.dumps(value, cls=JSONEncoder),
                 object_hook=JSONDecoder()), value)
 
-    def test_datetime(self):
-        'Test datetime'
-        self.dumps_loads(datetime.datetime.now())
 
-    def test_date(self):
-        'Test date'
-        self.dumps_loads(datetime.date.today())
-
-    def test_time(self):
-        'Test time'
-        self.dumps_loads(datetime.datetime.now().time())
-
-    def test_bytes(self):
-        'Test bytes'
-        self.dumps_loads(bytes(b'foo'))
-        self.dumps_loads(bytearray(b'foo'))
-
-    def test_decimal(self):
-        'Test Decimal'
-        self.dumps_loads(Decimal('3.141592653589793'))
-
-    def test_immutable_dict(self):
-        "Test ImmutableDict"
-        self.dumps_loads(ImmutableDict(foo='bar'))
-
-
-class XMLTestCase(unittest.TestCase):
+class XMLTestCase(DumpsLoadsMixin, unittest.TestCase):
     'Test XML'
 
     def test_xml_request(self):
@@ -83,30 +101,23 @@ class XMLTestCase(unittest.TestCase):
         result, = result
         self.assertEqual(value, result)
 
-    def test_decimal(self):
-        'Test Decimal'
-        self.dumps_loads(Decimal('3.141592653589793'))
-
-    def test_bytes(self):
-        'Test bytes'
-        self.dumps_loads(bytes(b'foo'))
-        self.dumps_loads(bytearray(b'foo'))
-
-    def test_date(self):
-        'Test date'
-        self.dumps_loads(datetime.date.today())
-
-    def test_time(self):
-        'Test time'
-        self.dumps_loads(datetime.datetime.now().time())
-
-    def test_immutable_dict(self):
-        "Test ImmutableDict"
-        self.dumps_loads(ImmutableDict(foo='bar'))
-
-    def test_none(self):
-        'Test None'
-        self.dumps_loads(None)
+    def test_decimal_class_load(self):
+        "Test load Decimal as __class__"
+        s = """<params><param><value>
+            <struct>
+                <member>
+                    <name>__class__</name>
+                    <value><string>Decimal</string></value>
+                </member>
+                <member>
+                    <name>decimal</name>
+                    <value><string>3.141592653589793</string></value>
+                </member>
+            </struct>
+            </value></param></params>"""
+        result, _ = client.loads(s)
+        result, = result
+        self.assertEqual(result, Decimal('3.141592653589793'))
 
 
 def suite():
