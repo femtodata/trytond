@@ -34,6 +34,9 @@ Repos will be cloned at the same level as this one, so you might want to clone i
    cd femtodata_tryton
    git clone git@github.com:femtodata/trytond.git
 
+   # checkout latest release branch
+   git checkout 6.2_femto
+
 Python env setup
 ++++
 Python version, install depdencies
@@ -86,8 +89,8 @@ Import Countries, Subdivisions, Postal codes
 ++++
 - making sure this is run with an activated venv
   ::
-     python ../modules/country/scripts/import_countries.py -c trytond.conf -d tryton
-     python ../modules/country/scripts/import_postal_codes.py -c trytond.conf -d tryton us
+     python -m trytond.modules.country.scripts.import_countries -c trytond.conf -d tryton
+     python -m trytond.modules.country.scripts.import_postal_codes -c trytond.conf -d tryton us
      ...
 
   note: CN postal codes do not seem to be available for import
@@ -116,7 +119,7 @@ Pgadmin
 
 Reset
 ++++
-You can reset everything by deleting the docker volume that contains the postgres db, and recreating:
+You can reset everything by deleting the docker volume that contains the postgres db, and recreating; using ``docker-compose down`` ensures the container is removed, so the volume and be recreated:
 ::
    docker-compose down
    docker volume rm trytond_postgres

@@ -1,12 +1,14 @@
-psycopg2
+coda
+csb43
 bcrypt
+febelfin-coda
 ldap3
+ofxparse
+pillow  # product_image
+proteus
+psycopg2
+PyPDF2
 python-stdnum
 simpleeval
 stripe
-coda
-febelfin-coda
 zeep
-PyPDF2
-csb43
-ofxparse

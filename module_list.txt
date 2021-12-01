@@ -1,6 +1,7 @@
 account
 account_asset
 account_be
+account_budget
 account_credit_limit
 account_deposit
 account_de_skr03
@@ -17,12 +18,14 @@ account_invoice_correction
 account_invoice_history
 account_invoice_line_standalone
 account_invoice_stock
+account_move_line_grouping
 account_payment
 account_payment_clearing
 account_payment_sepa
 account_payment_sepa_cfonb
 account_payment_stripe
 account_product
+account_rule
 account_statement
 account_statement_aeb43
 account_statement_coda
@@ -31,9 +34,11 @@ account_stock_anglo_saxon
 account_stock_continental
 account_stock_landed_cost
 account_stock_landed_cost_weight
+account_stock_shipment_cost
 account_tax_cash
 account_tax_rule_country
 analytic_account
+analytic_budget
 analytic_invoice
 analytic_purchase
 analytic_sale
@@ -48,6 +53,8 @@ company
 company_work_time
 country
 currency
+# currency_romanian
+# currency_serbian
 customs
 dashboard
 edocument_uncefact
@@ -64,6 +71,8 @@ product_classification
 product_classification_taxonomic
 product_cost_fifo
 product_cost_history
+product_image
+product_image_attribute
 production
 production_outsourcing
 production_routing
@@ -92,6 +101,7 @@ sale_extra
 sale_invoice_grouping
 sale_opportunity
 sale_payment
+sale_point
 sale_price_list
 sale_product_customer
 sale_promotion
@@ -116,6 +126,8 @@ stock_lot_unit
 stock_package
 stock_package_shipping
 stock_package_shipping_dpd
+stock_package_shipping_mygls
+stock_package_shipping_sendcloud
 stock_package_shipping_ups
 stock_product_location
 stock_shipment_cost
@@ -127,4 +139,6 @@ stock_supply_forecast
 stock_supply_production
 timesheet
 timesheet_cost
+web_shop
+# web_shop_shopify
 web_user
